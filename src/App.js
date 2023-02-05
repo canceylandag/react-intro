@@ -30,7 +30,8 @@ const initialForm={
   surname: "",
   age: "",
   job: "",
-  salary: ""
+  salary: "",
+  id:""
 }
 
 const App = () => {
@@ -44,8 +45,6 @@ const App = () => {
   
   const [personForm, setPersonForm] = useState(initialForm);
 
-  const [createOrUpdate, setCreateorUpdate] = useState(false);
-  
   const [formSubmitted, setformSubmitted] = useState(false);
 
   const [selectedId, setSelectedId] = useState(0);
@@ -59,12 +58,9 @@ const App = () => {
   const handleClose2 = () => setOpenDelete(false);
 
   const openCreateUpdateModal = (input) => {
-    input ? setCreateorUpdate(true) : setCreateorUpdate(false);
-    setSelectedId(input);
     if (input) {
-      let objIndex = list.findIndex((x => x.id == selectedId));
-      setPersonForm({ name: list[objIndex]["name"], surname: list[objIndex]["surname"], age: list[objIndex]["age"], job: list[objIndex]["job"], salary: list[objIndex]["salary"] });
-
+      setSelectedId(input.id);
+      setPersonForm({...input});
     }
     handleOpen();
   }
@@ -74,37 +70,35 @@ const App = () => {
     handleOpen2();
   }
 
-  const crudObject = {
-    openCreateUpdateModal, openDeleteModal
-  }
-
+ 
   const deletePerson = () => {
 
-    setList(list.filter(x => x.id != selectedId));
+    setList(list.filter(x => x.id !== selectedId));
     handleClose2();
   }
 
-  const editPerson = (input) => {
+  const handleSubmit=(e)=>{
+    e.preventDefault();
     setformSubmitted(true);
     if (!(personForm.name && personForm.age && personForm.job && personForm.salary)) {
       return;
     }
-    let objIndex = list.findIndex((x => x.id == input));
-    list[objIndex] = { ...list[objIndex], ...personForm };
+
+    if (personForm.id) {
+      const _list=[...list];
+      const index=_list.findIndex(x=>x.id===personForm.id);
+      _list[index]=personForm;
+      setList(_list);
+
+      // setList([...list.filter(x=>x.id!==personForm.id),{...personForm}])
+    }else{
+      setList([...list, { ...personForm, id: (list.length + 1) }]);
+    }
+
     resetForm();
     handleClose();
   }
 
-  const createPerson = () => {
-    setformSubmitted(true);
-    if (!(personForm.name && personForm.age && personForm.job && personForm.salary)) {
-      return;
-    }
-    setList([...list, { ...personForm, id: (list.length + 1) }]);
-    resetForm();
-    handleClose();
-  }
-  
   const handleForm = (e) => {
     setPersonForm({ ...personForm, [e.target.name]: e.target.value })
   }
@@ -114,6 +108,8 @@ const App = () => {
     setformSubmitted(false);
   }
 
+  
+
   return (
     <div>
       <BrowserRouter>
@@ -122,7 +118,7 @@ const App = () => {
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
-            <Route path="person-list" element={<PersonList list={list} functions={crudObject} />} />
+            <Route path="person-list" element={<PersonList list={list} functions={{openCreateUpdateModal,openDeleteModal}} />} />
             <Route path="*" element={<NoPage />} />
           </Route>
         </Routes>
@@ -166,14 +162,15 @@ const App = () => {
               }
 
             </div>
-            {createOrUpdate ?
-              <button onClick={() => editPerson(selectedId)}>
-                Güncelle
-              </button> :
-              <button onClick={() => createPerson()}>
-                Kaydet
+           
+              <button onClick={(e) => handleSubmit(e)}>
+                { personForm.id?
+                  <span>Güncelle</span>
+                  :
+                  <span>Kaydet</span>
+                 }
               </button>
-            }
+           
             <button onClick={()=>{handleClose();resetForm();}}>Hayır</button>
           </form>
         </CustomModal>}
@@ -184,7 +181,7 @@ const App = () => {
           </div>
           <div>
           <button onClick={()=>deletePerson()}>Evet</button>
-            <button onClick={handleClose2}>Hayır</button>
+            <button onClick={()=>{handleClose2();setSelectedId(0);}}>Hayır</button>
           </div>
           </CustomModal>}
 

@@ -18,7 +18,7 @@ const NewPerson = (props) => {
                     <td>{person.job}</td>
                     <td>{person.salary}</td>
                     <td>
-                        <button onClick={()=>functions.openCreateUpdateModal(person.id)}>Düzenle</button>
+                        <button onClick={()=>functions.openCreateUpdateModal(person)}>Düzenle</button>
                         <button onClick={()=>functions.openDeleteModal(person.id)}>Sil</button>
                     </td>
 
