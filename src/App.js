@@ -24,6 +24,15 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
+
+const initialForm={
+  name: "",
+  surname: "",
+  age: "",
+  job: "",
+  salary: ""
+}
+
 const App = () => {
 
   const personList = [{ name: "Can", surname: "Ceylandağ", age: "25", job: "Developer", salary: 17000, id: 1 },
@@ -32,15 +41,13 @@ const App = () => {
   { name: "tyuyu", surname: "nmbnm", age: "34", job: "Doctor", salary: 22000, id: 4 },]
 
   const [list, setList] = useState(personList);
-  const [personForm, setPersonForm] = useState({
-    name: "",
-    surname: "",
-    age: "",
-    job: "",
-    salary: ""
-  })
+  
+  const [personForm, setPersonForm] = useState(initialForm);
+
   const [createOrUpdate, setCreateorUpdate] = useState(false);
+  
   const [formSubmitted, setformSubmitted] = useState(false);
+
   const [selectedId, setSelectedId] = useState(0);
 
   const [open, setOpen] = React.useState(false);
@@ -51,32 +58,6 @@ const App = () => {
   const handleOpen2 = () => setOpenDelete(true);
   const handleClose2 = () => setOpenDelete(false);
 
-  const deletePerson = () => {
-
-    setList(list.filter(x => x.id != selectedId));
-    handleClose2();
-  }
-  const editPerson = (input) => {
-    setformSubmitted(true);
-    if (!(personForm.name && personForm.age && personForm.job && personForm.salary)) {
-      return;
-    }
-    let objIndex = list.findIndex((x => x.id == input));
-    list[objIndex] = { ...list[objIndex], name: personForm.name, surname: personForm.surname, age: personForm.age, job: personForm.job, salary: personForm.salary };
-    setPersonForm({ name: "", age: "", job: "", salary: "" });
-    setformSubmitted(false);
-    handleClose()
-  }
-  const createPerson = () => {
-    setformSubmitted(true);
-    if (!(personForm.name && personForm.age && personForm.job && personForm.salary)) {
-      return;
-    }
-    setList([...list, { name: personForm.name, surname: personForm.surname, age: personForm.age, job: personForm.job, salary: personForm.salary, id: (list.length + 1) }]);
-    setPersonForm({ name: "", age: "", job: "", salary: "" });
-    setformSubmitted(false);
-    handleClose();
-  }
   const openCreateUpdateModal = (input) => {
     input ? setCreateorUpdate(true) : setCreateorUpdate(false);
     setSelectedId(input);
@@ -87,17 +68,51 @@ const App = () => {
     }
     handleOpen();
   }
+
   const openDeleteModal = (input) => {
     setSelectedId(input);
     handleOpen2();
   }
+
   const crudObject = {
     openCreateUpdateModal, openDeleteModal
   }
+
+  const deletePerson = () => {
+
+    setList(list.filter(x => x.id != selectedId));
+    handleClose2();
+  }
+
+  const editPerson = (input) => {
+    setformSubmitted(true);
+    if (!(personForm.name && personForm.age && personForm.job && personForm.salary)) {
+      return;
+    }
+    let objIndex = list.findIndex((x => x.id == input));
+    list[objIndex] = { ...list[objIndex], ...personForm };
+    resetForm();
+    handleClose();
+  }
+
+  const createPerson = () => {
+    setformSubmitted(true);
+    if (!(personForm.name && personForm.age && personForm.job && personForm.salary)) {
+      return;
+    }
+    setList([...list, { ...personForm, id: (list.length + 1) }]);
+    resetForm();
+    handleClose();
+  }
+  
   const handleForm = (e) => {
     setPersonForm({ ...personForm, [e.target.name]: e.target.value })
   }
 
+  const resetForm=()=>{
+    setPersonForm(initialForm);
+    setformSubmitted(false);
+  }
 
   return (
     <div>
@@ -113,7 +128,7 @@ const App = () => {
         </Routes>
       </BrowserRouter>
       {open &&
-        <CustomModal closeModal={handleClose}>
+        <CustomModal closeModal={()=>{handleClose();resetForm();}}>
           <form>
             <div>
               <label>Ad</label><br />
@@ -159,7 +174,7 @@ const App = () => {
                 Kaydet
               </button>
             }
-            <button onClick={handleClose}>Hayır</button>
+            <button onClick={()=>{handleClose();resetForm();}}>Hayır</button>
           </form>
         </CustomModal>}
         {opendelte&&
