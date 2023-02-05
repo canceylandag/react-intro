@@ -13,12 +13,13 @@ const NewPerson = (props) => {
 
 
                     <td>{person.name}</td>
+                    <td>{person.surname}</td>
                     <td>{person.age}</td>
                     <td>{person.job}</td>
                     <td>{person.salary}</td>
                     <td>
                         <button onClick={()=>functions.openCreateUpdateModal(person.id)}>Düzenle</button>
-                        <button onClick={functions.openDeleteModal}>Sil</button>
+                        <button onClick={()=>functions.openDeleteModal(person.id)}>Sil</button>
                     </td>
 
                 </tr>

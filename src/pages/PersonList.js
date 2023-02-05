@@ -20,18 +20,25 @@ const PersonList = (props) => {
                 <table>
                     <thead>
                         <tr>
-                            <th>Ad Soyad</th>
+                            <th>Ad</th>
+                            <th>Soyad</th>
                             <th>Yaş</th>
                             <th>Meslek</th>
                             <th>Maaş</th>
                             <th>İşlemler</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    {
+                        list.length===0?
+                        <div>Lütfen Bir kayıt Ekleyin</div>
+                        :
+                        <tbody>
                         {
                             list.map((x) => (<NewPerson individual={x} func={functions} />))
                         }
                     </tbody>
+                    }
+                   
                 </table>
 
 
